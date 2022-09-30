@@ -1,0 +1,8 @@
+.card-title {
+    text-transform: capitalize;
+}
+
+.btn-nav {
+    display: flex !important;
+    width: 70%;
+}

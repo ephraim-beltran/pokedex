@@ -1,23 +1,24 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import PokemonList from "./pokemon-component/pokemon-list";
+import PokemonSearchBar from "./pokemon-component/pokemon-search";
+import { useState } from "react";
 
 function App() {
+  const [pokeName, setPokeName] = useState('');
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <nav className="navbar bg-dark">
+        <div className="container-sm">
+          <a className="navbar-brand text-white" href="/PokeList">
+            Pokedex
+          </a>
+        </div>
+      </nav>
+      <main className="container-sm my-3">
+      <PokemonSearchBar pokeName={pokeName} setPokeName={setPokeName} />
+      <PokemonList pokeName={pokeName} />
+      </main>
     </div>
   );
 }

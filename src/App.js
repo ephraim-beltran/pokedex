@@ -4,7 +4,7 @@ import PokemonSearchBar from "./pokemon-component/pokemon-search";
 import { useState } from "react";
 
 function App() {
-  const [pokeName, setPokeName] = useState('');
+  const [pokeName, setPokeName] = useState("");
 
   return (
     <div>
@@ -16,8 +16,8 @@ function App() {
         </div>
       </nav>
       <main className="container-sm my-3">
-      <PokemonSearchBar pokeName={pokeName} setPokeName={setPokeName} />
-      <PokemonList pokeName={pokeName} />
+        <PokemonSearchBar pokeName={pokeName} setPokeName={setPokeName} />
+        <PokemonList pokeName={pokeName} />
       </main>
     </div>
   );

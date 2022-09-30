@@ -20,13 +20,14 @@ const PokemonCard = ({ pokeApi }) => {
   );
 };
 
-const PokemonList = () => {
+const PokemonList = ({pokeName}) => {
   const [pokeList, setPokeList] = useState([]);
   const [currentPage, setCurrentPage] = useState(
     "https://pokeapi.co/api/v2/pokemon?limit=16&offset=0"
   );
   const [previousPage, setPreviousPage] = useState(null);
   const [nextPage, setNextPage] = useState("");
+  const filteredList = [];
 
   useEffect(() => {
     fetch(currentPage)
@@ -38,17 +39,33 @@ const PokemonList = () => {
       });
   }, [currentPage]);
 
+  useEffect(() => {
+    fetch('https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0')
+    .then(res => res.json())
+    .then(data => {
+      data.results.map((obj, i) => {
+        if (obj.name === pokeName) {
+          filteredList.push(obj)
+        }
+      })
+    })
+  }, [pokeName])
+
   const pokeListItems = pokeList.map((obj, i) => {
     return <PokemonCard pokeApi={obj} key={i} />;
   });
-  
+
   return (
     <>
       <div className="row row-cols-2 justify-content-center g-2">
         {pokeListItems}
-        {/* Button navigations */}
       </div>
-      <div className="btn-group btn-nav row-cols-3 my-3 mx-auto" role="group" aria-label="Page navigation">
+      {/* Button navigations */}
+      <div
+        className="btn-group btn-nav row-cols-3 my-3 mx-auto"
+        role="group"
+        aria-label="Page navigation"
+      >
         <button
           type="button"
           className="btn btn-dark"

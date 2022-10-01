@@ -6,7 +6,7 @@ const PokemonSearchBar = ({setPokeName, pokeName}) => {
         className="form-control my-3"
         type="text"
         placeholder="Search Pokemon"
-        aria-label="default input example"
+        aria-label="Search Pokemon"
         value={pokeName}
         onChange={(e)=> {
           setPokeName(e.target.value);

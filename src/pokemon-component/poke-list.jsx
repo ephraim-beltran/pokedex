@@ -1,5 +1,6 @@
 import PokemonCard from "./PokemonCard";
 import { useEffect, useState } from "react";
+import './poke-list.css';
 
 const PokemonList = () => {
   const [currentPage, setCurrentPage] = useState(

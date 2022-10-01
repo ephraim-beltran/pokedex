@@ -1,4 +1,3 @@
-import "./App.css";
 import Home from "./pages/Home";
 import PokemonSearchBar from "./pokemon-component/pokemon-search";
 import { useState } from "react";

@@ -21,7 +21,7 @@ const PokemonList = () => {
   }, [currentPage]);
 
   const pokeListItems = pokeList.map((obj, i) => {
-    return <PokemonCard pokeApi={obj} key={i} />;
+    return <PokemonCard pokeApi={obj.url} key={i} />;
   });
 
   return (

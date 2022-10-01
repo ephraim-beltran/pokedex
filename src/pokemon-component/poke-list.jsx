@@ -4,7 +4,7 @@ import './poke-list.css';
 
 const PokemonList = () => {
   const [currentPage, setCurrentPage] = useState(
-    "https://pokeapi.co/api/v2/pokemon?limit=16&offset=0"
+    "https://pokeapi.co/api/v2/pokemon-species?limit=16&offset=0"
   );
   const [previousPage, setPreviousPage] = useState(null);
   const [nextPage, setNextPage] = useState("");

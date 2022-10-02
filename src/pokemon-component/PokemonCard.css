@@ -1,3 +1,19 @@
 .card-title {
     text-transform: capitalize;
 }
+.card-body {
+    position: relative;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.card-subtitle {
+    position: absolute;
+    bottom: 0;
+    right: -2ch;
+    min-width: 8ch;
+    background-color: black;
+    color: white;
+    padding-left: 1ch;
+    padding-right: 3ch;
+    transform: skewX(-20deg);
+}

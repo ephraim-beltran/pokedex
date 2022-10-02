@@ -3,6 +3,7 @@ import PokemonSearchBar from "./pokemon-component/pokemon-search";
 import { useState } from "react";
 import { Link, Route, Routes } from "react-router-dom";
 import SearchResults from "./pages/SearchResults";
+import PokemonData from "./pages/PokemonData";
 
 function App() {
   const [pokeName, setPokeName] = useState("");
@@ -21,9 +22,10 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route
-            path="/search-results"
+            path="/pokemon"
             element={<SearchResults pokeName={pokeName} />}
           />
+          <Route path="/pokemon/:id" element={<PokemonData />} />
         </Routes>
       </main>
     </>

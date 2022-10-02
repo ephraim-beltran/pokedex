@@ -10,7 +10,7 @@ const PokemonSearchBar = ({setPokeName, pokeName}) => {
         value={pokeName}
         onChange={(e)=> {
           setPokeName(e.target.value);
-          navigate('/search-results');
+          navigate('/pokemon');
         }
         }
       />

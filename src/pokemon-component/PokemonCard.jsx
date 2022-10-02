@@ -2,17 +2,25 @@ import { useState , useEffect } from "react";
 import "./PokemonCard.css";
 
 const PokemonCard = ({ pokeApi }) => {
+  const [pokeId, setPokeId] = useState('');
   const [pokeImage, setPokeImage] = useState("");
   const [pokeName, setPokeName] = useState("");
 
   useEffect(() => {
     fetch(pokeApi)
       .then(res => res.json())
-      .then(data => {
-        setPokeImage(data.sprites.other["official-artwork"]["front_default"]);
-        setPokeName(data.name);
+      .then(species => {
+        setPokeId(species.id);
+        setPokeName(species.name);
+
+        fetch(`https://pokeapi.co/api/v2/pokemon/${pokeId}`)
+        .then(res => res.json())
+        .then(pokemon => {
+          setPokeImage(pokemon.sprites["other"]["official-artwork"]["front_default"]);
+        })
+        
       });
-  }, [pokeApi]);
+  });
 
   return (
     <div className="card mx-1" style={{ width: "10rem" }}>

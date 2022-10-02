@@ -6,7 +6,7 @@ const SearchResults = ({ pokeName }) => {
 
   useEffect(() => {
     if (pokeName !== null) {
-      fetch("https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0")
+      fetch("https://pokeapi.co/api/v2/pokemon-species?limit=100000&offset=0")
         .then((res) => res.json())
         .then((data) => {
           setPokeList(data.results);

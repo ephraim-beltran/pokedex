@@ -1,6 +1,7 @@
 import PokemonCard from "./PokemonCard";
 import { useEffect, useState } from "react";
-import './poke-list.css';
+import "./poke-list.css";
+import { MoonLoader } from "react-spinners";
 
 const PokemonList = () => {
   const [currentPage, setCurrentPage] = useState(
@@ -9,14 +10,17 @@ const PokemonList = () => {
   const [previousPage, setPreviousPage] = useState(null);
   const [nextPage, setNextPage] = useState("");
   const [pokeList, setPokeList] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    setLoading(true);
     fetch(currentPage)
       .then((res) => res.json())
       .then((data) => {
         setPokeList(data.results);
         setPreviousPage(data.previous);
         setNextPage(data.next);
+        setLoading(false);
       });
   }, [currentPage]);
 
@@ -27,7 +31,12 @@ const PokemonList = () => {
   return (
     <>
       <div className="row row-cols-2 justify-content-center g-2">
-        {pokeListItems}
+        {
+          loading ?
+          <MoonLoader color="#000000" />
+          :
+          pokeListItems
+        }
       </div>
       {/* Button navigations */}
       <div

@@ -39,8 +39,6 @@ const PokemonInfo = () => {
         })
     );
 
-    const pokemonTypes = pokemonSpecies.varieties[pokemonSpecies.varieties.indexOf(obj=> obj.name === activeForm)].types;
-
     // ===============
     // DATA FETCH ENDS
     // ===============
@@ -61,7 +59,7 @@ const PokemonInfo = () => {
     // ==================
     };
     fetchPokemonData();
-  }, [id, activeForm]);
+  }, [id]);
 
   const pokeFormList = pokemonSpecies.varieties.map((form) => {
     return form.name;

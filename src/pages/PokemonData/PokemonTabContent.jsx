@@ -12,7 +12,8 @@ const PokemonTabContent = ({activeForm}) => {
           This is home
         </div>
         <div
-          className="tab-pane fade show active"
+          // className="tab-pane fade show active"
+          className="tab-pane fade show"
           id="charizard-mega-x-tab-pane"
           role="tabpanel"
           aria-labelledby="charizard-mega-x-tab"

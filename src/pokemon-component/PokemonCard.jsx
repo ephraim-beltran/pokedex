@@ -12,6 +12,7 @@ const PokemonCard = ({ pokeApi }) => {
   const pokemonData = `/pokemon/${pokeId}`;
 
   useEffect(() => {
+    const controller = new AbortController();
     setLoading(true);
     fetch(pokeApi)
       .then((res) => res.json())
@@ -26,7 +27,7 @@ const PokemonCard = ({ pokeApi }) => {
           ].entry_number
         );
 
-        fetch(`https://pokeapi.co/api/v2/pokemon/${pokeId}`)
+        fetch(`https://pokeapi.co/api/v2/pokemon/${pokeId}`, { signal: controller.signal })
           .then((res) => res.json())
           .then((pokemon) => {
             if (pokemon.sprites) {
@@ -37,6 +38,7 @@ const PokemonCard = ({ pokeApi }) => {
             }
           });
       });
+      return () => { controller.abort() }
   }, [pokeId, pokeApi]);
 
   return (

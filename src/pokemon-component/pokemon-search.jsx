@@ -6,9 +6,15 @@ const PokemonSearchBar = ({ setPokeName, pokeName }) => {
   useEffect(() => {
     if (searchInput.length > 2) {
       setPokeName(searchInput);
-      navigate("/pokemon");
+    } else {
+      setPokeName('')
     }
-  }, [searchInput]);
+  }, [searchInput, setPokeName]);
+
+  const handleInput = (e) => {
+    setSearchInput(e.target.value);
+    navigate("/pokemon");
+  }
 
   return (
     <input
@@ -17,7 +23,7 @@ const PokemonSearchBar = ({ setPokeName, pokeName }) => {
       placeholder="Search Pokemon"
       aria-label="Search Pokemon"
       value={searchInput}
-      onChange={(e) => setSearchInput(e.target.value)}
+      onChange={handleInput}
     />
   );
 };

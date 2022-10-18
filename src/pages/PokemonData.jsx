@@ -1,73 +1,95 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
-import PokemonFormCard from "./PokemonData/PokemonFormCard";
-import PokemonForm from "./PokemonData/PokemonForm";
+import PokemonForms from "./PokemonData/PokemonForms";
+import PokemonTabContent from "./PokemonData/PokemonTabContent";
 
-const PokemonData = () => {
+const PokemonInfo = () => {
   const { id } = useParams();
-  const [pokeName, setPokeName] = useState("");
-  const [pokemonForms, setPokemonForms] = useState([]);
-  const [pokemonFormCurrent, setPokemonFormCurrent] = useState({});
-  const [pokemonImage, setPokemonImage] = useState("");
-  const [pokemonType, setPokemonType] = useState([]);
+  const [pokemonSpecies, setPokemonSpecies] = useState({
+    name: "type-null",
+    varieties: [],
+  });
+  const [activeForm, setActiveForm] = useState("");
 
+  
   useEffect(() => {
-    fetch(`https://pokeapi.co/api/v2/pokemon-species/${id}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setPokeName(data.name);
-        setPokemonForms(data.varieties);
-        setPokemonFormCurrent(
-          data.varieties[data.varieties.findIndex((obj) => obj.is_default)]
-        );
-      });
-  }, [id]);
+    const fetchPokemonData = async () => {
+    // =================
+    // DATA FETCH BEGINS
+    // =================
 
-  useEffect(() => {
-    if (Object.keys(pokemonFormCurrent).length !== 0) {
-      fetch(pokemonFormCurrent.pokemon.url)
-      .then((res) => res.json())
-      .then((data) => {
-        setPokemonImage(data.sprites.other["official-artwork"].front_default);
-        setPokemonType(data.types);
-      });
-      console.log("Pokemon Form loaded: " + pokemonFormCurrent.pokemon.name)
-    } else {
-      console.log("Not yet loaded");
-    }
-  }, [pokemonFormCurrent]);
+    // Gets access to whole Pokemon Species JSON
+    const pokemonSpecies = await fetch(
+        `https://pokeapi.co/api/v2/pokemon-species/${id}`
+    ).then((res) => res.json());
 
+    // Iterates through the Species varieties array API and returns an array
+    const pokemonForms = await Promise.all(
+        pokemonSpecies.varieties.map(async (pokeForm) => {
+        return await fetch(pokeForm.pokemon.url)
+            .then((res) => res.json())
+            .then((data) => {
+            return {
+                name: data.name,
+                image: data.sprites.other["official-artwork"].front_default,
+                types: data.types,
+                stats: data.stats,
+            };
+            });
+        })
+    );
+
+    const pokemonTypes = pokemonSpecies.varieties[pokemonSpecies.varieties.indexOf(obj=> obj.name === activeForm)].types;
+
+    // ===============
+    // DATA FETCH ENDS
+    // ===============
+
+    // ===================
+    // DATA SETTING BEGINS
+    // ===================
+    setPokemonSpecies({
+        name: pokemonSpecies.name,
+        varieties: pokemonForms,
+    });
+    // Sets a default active form
+    setActiveForm(
+        pokemonSpecies.varieties[pokemonSpecies.varieties.findIndex((obj) => obj.is_default)].pokemon.name
+        )
+    // ==================
+    // DATA SETTINGS ENDS
+    // ==================
+    };
+    fetchPokemonData();
+  }, [id, activeForm]);
+
+  const pokeFormList = pokemonSpecies.varieties.map((form) => {
+    return form.name;
+  });
   return (
     <>
       <div className="row">
         <h1 className="col-auto" style={{ textTransform: "capitalize" }}>
-          {pokeName}
+          {pokemonSpecies.name}
         </h1>
         <h2 className="col-auto fw-lighter"># {id}</h2>
-        <PokemonForm
-          pokemonForms={pokemonForms}
-          pokemonFormCurrent={pokemonFormCurrent}
-          setPokemonFormCurrent={setPokemonFormCurrent}
-        />
       </div>
-      <div className="row my-2">
-        <div id="pokemon-stats" className="col-sm-4">
-          <PokemonFormCard
-            pokemonImage={pokemonImage}
-            pokemonType={pokemonType}
+      <PokemonForms
+        pokeFormList={pokeFormList}
+        activeForm={activeForm}
+        setActiveForm={setActiveForm}
+      />
+      <div className="tab-content" id="myTabContent">
+        <PokemonTabContent
+          activeForm={activeForm}
+          varieties={pokemonSpecies.varieties}
           />
-        </div>
-        <div className="col">
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Tempora
-            quisquam ab odio inventore iste, autem architecto praesentium hic
-            corporis voluptatibus ipsum, officia quo maiores quidem ut
-            accusamus, nesciunt atque. Explicabo.
-          </p>
-        </div>
       </div>
     </>
   );
 };
 
-export default PokemonData;
+export default PokemonInfo;
+
+
+// TODO: Type damage relations

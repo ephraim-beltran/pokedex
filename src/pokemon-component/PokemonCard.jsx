@@ -13,7 +13,8 @@ const PokemonCard = ({ pokeApi }) => {
     // setLoading(true);
 
     const fetchListItem = async () => {
-      const cardData = await fetch(pokeApi, { signal: controller.signal }).then(
+      try {
+        const cardData = await fetch(pokeApi, { signal: controller.signal }).then(
         (res) => res.json()
       );
 
@@ -38,6 +39,10 @@ const PokemonCard = ({ pokeApi }) => {
         pokedex_number: pokedex_number,
         image: image,
       });
+    }
+    catch (error) {
+      if (controller.signal.aborted) return
+    }
     };
     pokeApi && fetchListItem();
     Object.keys(listCard).length > 0 && setLoading(false)

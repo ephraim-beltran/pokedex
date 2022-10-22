@@ -1,8 +1,10 @@
 import "./PokemonForms.css";
-
+// Accepts an array of strings and state hook
 const PokemonForms = ({ pokeFormList, activeForm, setActiveForm }) => {
   const formTabs = pokeFormList.map((form, i) => {
-    const pokemonName = form.replace("-", " ");
+    const pokemonName = form.pokemon.name;
+    const pokemonNameDerived = form.pokemon.name.replace("-", " ");
+    const activeName = activeForm.pokemon.name;
     const changeForm = (btn) => {
       btn.preventDefault();
       setActiveForm(form);
@@ -10,17 +12,17 @@ const PokemonForms = ({ pokeFormList, activeForm, setActiveForm }) => {
     return (
       <li className="nav-item" key={i}>
         <button
-          className={`nav-link ${form === activeForm ? "active" : ""}`}
-          id={`${form}-tab`}
+          className={`nav-link ${pokemonName === activeName && "active"}`}
+          id={`${pokemonName}-tab`}
           data-bs-toggle="tab"
-          data-bs-target={`#${form}-tab-pane`}
+          data-bs-target={`#${pokemonName}-tab-pane`}
           type="button"
           role="tab"
-          aria-controls={`#${form}-tab-pane`}
-          aria-selected={form === activeForm}
+          aria-controls={`#${pokemonName}-tab-pane`}
+          aria-selected={pokemonName === activeName}
           onClick={changeForm}
         >
-          {pokemonName}
+          {pokemonNameDerived}
         </button>
       </li>
     );

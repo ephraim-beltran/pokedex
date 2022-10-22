@@ -8,12 +8,14 @@ const PokemonInfo = () => {
   const [species, setSpecies] = useState({
     name: "type-null",
     varieties: [],
-    pokedex_numbers: [{
-      entry_number: 0,
-      pokedex: {
-        name: 'national'
-      }
-    }],
+    pokedex_numbers: [
+      {
+        entry_number: 0,
+        pokedex: {
+          name: "national",
+        },
+      },
+    ],
   });
   const [activeForm, setActiveForm] = useState({});
   const [pokemonData, setPokemonData] = useState({
@@ -44,7 +46,12 @@ const PokemonInfo = () => {
         is_hidden: abilities.is_hidden,
       };
     }),
-    national_dex: species.pokedex_numbers[species.pokedex_numbers.findIndex(dex => dex.pokedex.name === 'national')].entry_number
+    national_dex:
+      species.pokedex_numbers[
+        species.pokedex_numbers.findIndex(
+          (dex) => dex.pokedex.name === "national"
+        )
+      ].entry_number,
   };
 
   useEffect(() => {
@@ -53,17 +60,11 @@ const PokemonInfo = () => {
       try {
         // Gets access to whole Pokemon Species JSON
         const species = await fetch(
-          `https://pokeapi.co/api/v2/pokemon-species/${id}`
-          // { signal: controller.signal }
+          `https://pokeapi.co/api/v2/pokemon-species/${id}`,
+          { signal: controller.signal }
         ).then((res) => res.json());
 
-        // setSpecies({
-        //   name: species.name,
-        //   varieties: species.varieties,
-        //   pokedex_numbers: 
-        // });
-
-        setSpecies(species)
+        setSpecies(species);
 
         // Sets a default active form object
         setActiveForm(

@@ -86,19 +86,21 @@ const PokemonInfo = () => {
   useEffect(() => {
     const controller = new AbortController();
     const fetchFormData = async () => {
-      const formData = await fetch(activeForm.pokemon.url).then((res) =>
-        res.json()
-      );
-      setPokemonData(formData);
+      try {
+        const formData = await fetch(activeForm.pokemon.url, {
+          signal: controller.signal,
+        }).then((res) => res.json());
+        setPokemonData(formData);
+      } catch (error) {
+        if (controller.signal.aborted) return;
+      }
     };
     Object.keys(activeForm).length > 0 && fetchFormData();
-    return () => {
-      controller.abort();
-    };
+    return () => controller.abort();
   }, [activeForm]);
 
-  // =================
-  // Used for debuggin
+  // ==================
+  // Used for debugging
   useEffect(() => {
     Object.keys(activeForm).length > 0
       ? console.info(`Form loaded: ${activeForm.pokemon.name}`)
@@ -110,7 +112,7 @@ const PokemonInfo = () => {
       ? console.info(`Form data loaded: ID no. ${pokemonData.id}`)
       : console.error("Form data not loaded");
   }, [pokemonData]);
-  // =================
+  // ==================
   return (
     <>
       <div className="row">

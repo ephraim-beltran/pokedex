@@ -12,7 +12,7 @@ const PokemonForms = ({ pokeFormList, activeForm, setActiveForm }) => {
     return (
       <li className="nav-item" key={i}>
         <button
-          className={`nav-link ${pokemonName === activeName && "active"}`}
+          className={`nav-link ${pokemonName === activeName ? "active" : ""}`}
           id={`${pokemonName}-tab`}
           data-bs-toggle="tab"
           data-bs-target={`#${pokemonName}-tab-pane`}

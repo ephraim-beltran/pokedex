@@ -1,0 +1,14 @@
+.pokemon-type {
+    display: flex;
+    width: 100%;
+    justify-content: space-evenly;
+    align-content: center;
+    
+}
+.pokemon-type-item {
+    text-transform: capitalize;
+    border: 1px solid black;
+    border-radius: 5px;
+    flex-basis: 7ch;
+    text-align: center;
+}

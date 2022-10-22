@@ -76,7 +76,7 @@ const PokemonInfo = () => {
           ? console.info("Species data loaded")
           : console.warn("Species data not loaded");
       } catch (error) {
-        console.log(error);
+        if (controller.signal.aborted) return
       }
     };
     fetchData();

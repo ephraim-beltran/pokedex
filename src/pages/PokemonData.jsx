@@ -5,89 +5,135 @@ import PokemonTabContent from "./PokemonData/PokemonTabContent";
 
 const PokemonInfo = () => {
   const { id } = useParams();
-  const [pokemonSpecies, setPokemonSpecies] = useState({
+  const [species, setSpecies] = useState({
     name: "type-null",
     varieties: [],
+    pokedex_numbers: [{
+      entry_number: 0,
+      pokedex: {
+        name: 'national'
+      }
+    }],
   });
-  const [activeForm, setActiveForm] = useState("");
+  const [activeForm, setActiveForm] = useState({});
+  const [pokemonData, setPokemonData] = useState({
+    types: [],
+    stats: [],
+    abilities: [],
+    sprites: {
+      other: {
+        "official-artwork":
+          "https://images.unsplash.com/photo-1628155930542-3c7a64e2c833?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1074&q=80",
+      },
+    },
+  });
+  const pokemonInfo = {
+    name: species.name,
+    forms: species.varieties,
+    image: pokemonData.sprites.other["official-artwork"].front_default,
+    type: pokemonData.types.map((types) => types.type.name),
+    stats: pokemonData.stats.map((stats) => {
+      return {
+        name: stats.stat.name,
+        base_stat: stats.base_stat,
+      };
+    }),
+    abilities: pokemonData.abilities.map((abilities) => {
+      return {
+        name: abilities.ability.name,
+        is_hidden: abilities.is_hidden,
+      };
+    }),
+    national_dex: species.pokedex_numbers[species.pokedex_numbers.findIndex(dex => dex.pokedex.name === 'national')].entry_number
+  };
 
-  
   useEffect(() => {
-    const fetchPokemonData = async () => {
-    // =================
-    // DATA FETCH BEGINS
-    // =================
+    const controller = new AbortController();
+    const fetchData = async () => {
+      try {
+        // Gets access to whole Pokemon Species JSON
+        const species = await fetch(
+          `https://pokeapi.co/api/v2/pokemon-species/${id}`
+          // { signal: controller.signal }
+        ).then((res) => res.json());
 
-    // Gets access to whole Pokemon Species JSON
-    const pokemonSpecies = await fetch(
-        `https://pokeapi.co/api/v2/pokemon-species/${id}`
-    ).then((res) => res.json());
+        // setSpecies({
+        //   name: species.name,
+        //   varieties: species.varieties,
+        //   pokedex_numbers: 
+        // });
 
-    // Iterates through the Species varieties array API and returns an array
-    const pokemonForms = await Promise.all(
-        pokemonSpecies.varieties.map(async (pokeForm) => {
-        return await fetch(pokeForm.pokemon.url)
-            .then((res) => res.json())
-            .then((data) => {
-            return {
-                name: data.name,
-                image: data.sprites.other["official-artwork"].front_default,
-                types: data.types,
-                stats: data.stats,
-            };
-            });
-        })
-    );
+        setSpecies(species)
 
-    // ===============
-    // DATA FETCH ENDS
-    // ===============
-
-    // ===================
-    // DATA SETTING BEGINS
-    // ===================
-    setPokemonSpecies({
-        name: pokemonSpecies.name,
-        varieties: pokemonForms,
-    });
-    // Sets a default active form
-    setActiveForm(
-        pokemonSpecies.varieties[pokemonSpecies.varieties.findIndex((obj) => obj.is_default)].pokemon.name
-        )
-    // ==================
-    // DATA SETTINGS ENDS
-    // ==================
+        // Sets a default active form object
+        setActiveForm(
+          species.varieties[
+            species.varieties.findIndex((obj) => obj.is_default)
+          ]
+        );
+        Object.keys(species).length > 0
+          ? console.info("Species data loaded")
+          : console.warn("Species data not loaded");
+      } catch (error) {
+        console.log(error);
+      }
     };
-    fetchPokemonData();
+    fetchData();
+    return () => controller.abort();
   }, [id]);
 
-  const pokeFormList = pokemonSpecies.varieties.map((form) => {
-    return form.name;
-  });
+  useEffect(() => {
+    const controller = new AbortController();
+    const fetchFormData = async () => {
+      const formData = await fetch(activeForm.pokemon.url).then((res) =>
+        res.json()
+      );
+      setPokemonData(formData);
+    };
+    Object.keys(activeForm).length > 0 && fetchFormData();
+    return () => {
+      controller.abort();
+    };
+  }, [activeForm]);
+
+  // =================
+  // Used for debuggin
+  useEffect(() => {
+    Object.keys(activeForm).length > 0
+      ? console.info(`Form loaded: ${activeForm.pokemon.name}`)
+      : console.error("Form not loaded");
+  }, [activeForm]);
+
+  useEffect(() => {
+    Object.keys(pokemonData).length > 0
+      ? console.info(`Form data loaded: ID no. ${pokemonData.id}`)
+      : console.error("Form data not loaded");
+  }, [pokemonData]);
+  // =================
   return (
     <>
       <div className="row">
         <h1 className="col-auto" style={{ textTransform: "capitalize" }}>
-          {pokemonSpecies.name}
+          {pokemonInfo.name}
         </h1>
-        <h2 className="col-auto fw-lighter"># {id}</h2>
+        <h2 className="col-auto fw-lighter"># {pokemonInfo.national_dex}</h2>
       </div>
       <PokemonForms
-        pokeFormList={pokeFormList}
+        pokeFormList={pokemonInfo.forms}
         activeForm={activeForm}
         setActiveForm={setActiveForm}
       />
       <div className="tab-content" id="myTabContent">
         <PokemonTabContent
           activeForm={activeForm}
-          varieties={pokemonSpecies.varieties}
-          />
+          pokemonInfo={pokemonInfo}
+          varieties={species.varieties}
+        />
       </div>
     </>
   );
 };
 
 export default PokemonInfo;
-
 
 // TODO: Type damage relations

@@ -5,13 +5,14 @@ const SearchResults = ({ pokeName }) => {
   const [pokeList, setPokeList] = useState([]);
 
   useEffect(() => {
-    if (pokeName !== null) {
-      fetch("https://pokeapi.co/api/v2/pokemon-species?limit=100000&offset=0")
-        .then((res) => res.json())
-        .then((data) => {
-          setPokeList(data.results);
-        });
+    const controller = new AbortController();
+    const fetchList = async () => {
+      const list = await fetch("https://pokeapi.co/api/v2/pokemon-species?limit=100000&offset=0", {signal:controller.signal}).then((res) => res.json())
+      
+      setPokeList(list.results)
     }
+    pokeName !== null && fetchList()
+    return () => controller.abort()
   }, [pokeName]);
 
   const pokeFilter = pokeList.filter((pokemon) =>

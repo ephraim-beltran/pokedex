@@ -10,9 +10,11 @@ const TabContentCard = ({
     })
     return (
         <>
-        <div className={`card p-3 ${type[0]}`} >
-            <img src={image} alt="" />
-            <div className="pokemon-type">{types}</div>
+        <div className={`card p-3 pokemon-card ${type[0]}`} >
+            <img src={image} alt="" className="card-img-top"/>
+            <div className="card-body">
+                <div className="pokemon-type">{types}</div>
+            </div>
         </div>
         </>
     )

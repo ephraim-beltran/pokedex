@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { MoonLoader } from "react-spinners";
 import "./PokemonTabContent.css";
 import TabContentCard from "./PokemonTabContent/TabContentCard";
@@ -16,16 +15,6 @@ import TabContentCard from "./PokemonTabContent/TabContentCard";
 // national_dex: 0
 
 const PokemonTabContent = ({ activeForm, pokemonInfo }) => {
-  // =====================
-  // For console debugging
-  // =====================
-  useEffect(() => {
-    Object.keys(activeForm).length > 0
-      ? console.log("Active form selected")
-      : console.warn("No form active");
-  }, [activeForm]);
-  // =====================
-
   if (Object.keys(activeForm).length > 0) {
     const activeName = activeForm.pokemon.name;
     return (

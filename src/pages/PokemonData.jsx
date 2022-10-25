@@ -25,7 +25,7 @@ const PokemonInfo = () => {
     sprites: {
       other: {
         "official-artwork":
-          "https://images.unsplash.com/photo-1628155930542-3c7a64e2c833?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1074&q=80",
+          "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/772.png",
       },
     },
   });
@@ -76,7 +76,7 @@ const PokemonInfo = () => {
           ? console.info("Species data loaded")
           : console.warn("Species data not loaded");
       } catch (error) {
-        if (controller.signal.aborted) return
+        if (controller.signal.aborted) return;
       }
     };
     fetchData();
@@ -115,11 +115,13 @@ const PokemonInfo = () => {
   // ==================
   return (
     <>
-      <div className="row">
+      <div className="row align-items-center">
         <h1 className="col-auto" style={{ textTransform: "capitalize" }}>
           {pokemonInfo.name}
         </h1>
-        <h2 className="col-auto fw-lighter"># {pokemonInfo.national_dex}</h2>
+        <h2 className="col-auto fw-lighter align-self-end">
+          # {pokemonInfo.national_dex}
+        </h2>
       </div>
       <PokemonForms
         pokeFormList={pokemonInfo.forms}

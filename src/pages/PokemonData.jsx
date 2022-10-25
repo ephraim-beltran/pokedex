@@ -17,6 +17,7 @@ const PokemonInfo = () => {
       },
     ],
   });
+  const [speciesLoaded, setSpeciesLoaded] = useState(false); // Only used for debugging
   const [activeForm, setActiveForm] = useState({});
   const [pokemonData, setPokemonData] = useState({
     types: [],
@@ -24,37 +25,44 @@ const PokemonInfo = () => {
     abilities: [],
     sprites: {
       other: {
-        "official-artwork":
-          "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/772.png",
+        "official-artwork": {
+          front_default:
+            "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/772.png",
+        },
       },
     },
   });
-  const pokemonInfo = {
-    name: species.name,
-    forms: species.varieties,
-    image: pokemonData.sprites.other["official-artwork"].front_default,
-    type: pokemonData.types.map((types) => types.type.name),
-    stats: pokemonData.stats.map((stats) => {
-      return {
-        name: stats.stat.name,
-        base_stat: stats.base_stat,
-      };
-    }),
-    abilities: pokemonData.abilities.map((abilities) => {
-      return {
-        name: abilities.ability.name,
-        is_hidden: abilities.is_hidden,
-      };
-    }),
-    national_dex:
-      species.pokedex_numbers[
-        species.pokedex_numbers.findIndex(
-          (dex) => dex.pokedex.name === "national"
-        )
-      ].entry_number,
-  };
+  const [formLoaded, setFormLoaded] = useState(false);
+  let pokemonInfo = {};
+  if (formLoaded) {
+    pokemonInfo = {
+      name: species.name,
+      forms: species.varieties,
+      image: pokemonData.sprites.other["official-artwork"].front_default,
+      type: pokemonData.types.map((types) => types.type.name),
+      stats: pokemonData.stats.map((stats) => {
+        return {
+          name: stats.stat.name,
+          base_stat: stats.base_stat,
+        };
+      }),
+      abilities: pokemonData.abilities.map((abilities) => {
+        return {
+          name: abilities.ability.name,
+          is_hidden: abilities.is_hidden,
+        };
+      }),
+      national_dex:
+        species.pokedex_numbers[
+          species.pokedex_numbers.findIndex(
+            (dex) => dex.pokedex.name === "national"
+          )
+        ].entry_number,
+    };
+  }
 
   useEffect(() => {
+    setFormLoaded(false);
     const controller = new AbortController();
     const fetchData = async () => {
       try {
@@ -72,14 +80,13 @@ const PokemonInfo = () => {
             species.varieties.findIndex((obj) => obj.is_default)
           ]
         );
-        Object.keys(species).length > 0
-          ? console.info("Species data loaded")
-          : console.warn("Species data not loaded");
       } catch (error) {
         if (controller.signal.aborted) return;
+        else setFormLoaded(false);
       }
     };
     fetchData();
+    setSpeciesLoaded(true);
     return () => controller.abort();
   }, [id]);
 
@@ -90,55 +97,122 @@ const PokemonInfo = () => {
         const formData = await fetch(activeForm.pokemon.url, {
           signal: controller.signal,
         }).then((res) => res.json());
+
         setPokemonData(formData);
       } catch (error) {
         if (controller.signal.aborted) return;
       }
     };
-    Object.keys(activeForm).length > 0 && fetchFormData();
+
+    fetchFormData();
+    setFormLoaded(true);
     return () => controller.abort();
   }, [activeForm]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const typeInfoUrl = pokemonData.types.map((obj) => obj.type.url);
+    let damageList = [];
+    const fetchTypeInfo = async (url) => {
+      const typeInfo = await fetch(url, { signal: controller.signal }).then(
+        (res) => res.json()
+      );
+      const damageRelations = await typeInfo.damage_relations;
+      const multiplier = Object.keys(damageRelations);
+      multiplier.forEach((obj) => {
+        let position;
+        let damage;
+        switch (obj) {
+          case "double_damage_from":
+            position = "defence";
+            damage = 2;
+            break;
+
+          case "double_damage_to":
+            position = "attack";
+            damage = 2;
+            break;
+
+          case "half_damage_from":
+            position = "defence";
+            damage = 0.5;
+            break;
+
+          case "half_damage_to":
+            position = "attack";
+            damage = 0.5;
+            break;
+
+          case "no_damage_from":
+            position = "defence";
+            damage = 0;
+            break;
+
+          case "no_damage_to":
+            position = "attack";
+            damage = 0;
+            break;
+
+          default:
+            break;
+        }
+        damageRelations[obj].forEach((type) => {
+          damageList.push({
+            position: position,
+            damage: damage,
+            type: type.name,
+          });
+        });
+      });
+    };
+
+    typeInfoUrl.forEach((url) => fetchTypeInfo(url));
+    console.log(damageList);
+    return () => {
+      controller.abort();
+    };
+  }, [pokemonData]);
 
   // ==================
   // Used for debugging
   useEffect(() => {
-    Object.keys(activeForm).length > 0
-      ? console.info(`Form loaded: ${activeForm.pokemon.name}`)
-      : console.error("Form not loaded");
-  }, [activeForm]);
+    speciesLoaded && console.info(`Species loaded: ${species.name}`);
+  }, [speciesLoaded, species]);
 
   useEffect(() => {
-    Object.keys(pokemonData).length > 0
-      ? console.info(`Form data loaded: ID no. ${pokemonData.id}`)
-      : console.error("Form data not loaded");
-  }, [pokemonData]);
+    formLoaded && console.info(`Form data loaded: ID no. ${pokemonData.id}`);
+  }, [pokemonData, formLoaded]);
   // ==================
-  return (
-    <>
-      <div className="row align-items-center">
-        <h1 className="col-auto" style={{ textTransform: "capitalize" }}>
-          {pokemonInfo.name}
-        </h1>
-        <h2 className="col-auto fw-lighter align-self-end">
-          # {pokemonInfo.national_dex}
-        </h2>
-      </div>
-      <PokemonForms
-        pokeFormList={pokemonInfo.forms}
-        activeForm={activeForm}
-        setActiveForm={setActiveForm}
-      />
-      <div className="tab-content" id="myTabContent">
-        <PokemonTabContent
+  if (formLoaded) {
+    return (
+      <>
+        <div className="row align-items-center">
+          <h1 className="col-auto" style={{ textTransform: "capitalize" }}>
+            {pokemonInfo.name}
+          </h1>
+          <h2 className="col-auto fw-lighter align-self-end">
+            # {pokemonInfo.national_dex}
+          </h2>
+        </div>
+        <PokemonForms
+          pokeFormList={pokemonInfo.forms}
           activeForm={activeForm}
-          pokemonInfo={pokemonInfo}
-          varieties={species.varieties}
+          setActiveForm={setActiveForm}
         />
-      </div>
-    </>
-  );
+        <div className="tab-content" id="myTabContent">
+          <PokemonTabContent
+            activeForm={activeForm}
+            pokemonInfo={pokemonInfo}
+            varieties={species.varieties}
+          />
+        </div>
+      </>
+    );
+  } else {
+    return <div>Loading Pokemon</div>;
+  }
 };
 
 export default PokemonInfo;
 
-// TODO: Type damage relations
+// TODO: Summarize damageList

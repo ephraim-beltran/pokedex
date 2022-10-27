@@ -33,6 +33,7 @@ const PokemonInfo = () => {
     },
   });
   const [formLoaded, setFormLoaded] = useState(false);
+  const [pokemonDamageList, setPokemonDamageList] = useState([]);
   let pokemonInfo = {};
   if (formLoaded) {
     pokemonInfo = {
@@ -58,6 +59,8 @@ const PokemonInfo = () => {
             (dex) => dex.pokedex.name === "national"
           )
         ].entry_number,
+        defensive: pokemonDamageList.filter(obj => obj.position === 'defence'),
+        offensive: pokemonDamageList.filter(obj => obj.position === 'attack')
     };
   }
 
@@ -111,63 +114,89 @@ const PokemonInfo = () => {
 
   useEffect(() => {
     const controller = new AbortController();
-    const typeInfoUrl = pokemonData.types.map((obj) => obj.type.url);
-    let damageList = [];
-    const fetchTypeInfo = async (url) => {
-      const typeInfo = await fetch(url, { signal: controller.signal }).then(
-        (res) => res.json()
-      );
-      const damageRelations = await typeInfo.damage_relations;
-      const multiplier = Object.keys(damageRelations);
-      multiplier.forEach((obj) => {
-        let position;
-        let damage;
-        switch (obj) {
-          case "double_damage_from":
-            position = "defence";
-            damage = 2;
-            break;
+    const filterTypeData = (data) => {
+      let damageListFiltered = [];
 
-          case "double_damage_to":
-            position = "attack";
-            damage = 2;
-            break;
-
-          case "half_damage_from":
-            position = "defence";
-            damage = 0.5;
-            break;
-
-          case "half_damage_to":
-            position = "attack";
-            damage = 0.5;
-            break;
-
-          case "no_damage_from":
-            position = "defence";
-            damage = 0;
-            break;
-
-          case "no_damage_to":
-            position = "attack";
-            damage = 0;
-            break;
-
-          default:
-            break;
+      data.forEach(obj => {
+        const index = damageListFiltered.findIndex(
+          (item) => item.type === obj.type && item.position === obj.position
+        );
+        
+        if (index !== -1) {
+          damageListFiltered[index].damage =
+            damageListFiltered[index].damage * obj.damage;
+        } else {
+          damageListFiltered.push(obj);
         }
-        damageRelations[obj].forEach((type) => {
-          damageList.push({
-            position: position,
-            damage: damage,
-            type: type.name,
-          });
-        });
-      });
+      })
+      
+      return damageListFiltered
     };
 
-    typeInfoUrl.forEach((url) => fetchTypeInfo(url));
-    console.log(damageList);
+    const fetchTypeData = async (dataUrl) => {
+      let data = [];
+
+        const typeData = await fetch(dataUrl).then((res) => res.json());
+        const damageRelations = await typeData.damage_relations; // Return an Object
+        const damageMultiplier = Object.keys(damageRelations); // Returns an array
+        damageMultiplier.forEach((multiplier) => {
+          let position;
+          let damage;
+          switch (multiplier) {
+            case "double_damage_from":
+              position = "defence";
+              damage = 2;
+              break;
+
+            case "double_damage_to":
+              position = "attack";
+              damage = 2;
+              break;
+
+            case "half_damage_from":
+              position = "defence";
+              damage = 0.5;
+              break;
+
+            case "half_damage_to":
+              position = "attack";
+              damage = 0.5;
+              break;
+
+            case "no_damage_from":
+              position = "defence";
+              damage = 0;
+              break;
+
+            case "no_damage_to":
+              position = "attack";
+              damage = 0;
+              break;
+
+            default:
+              break;
+          }
+          damageRelations[multiplier].forEach((type) => {
+            const newItem = {
+              position: position,
+              damage: damage,
+              type: type.name,
+            }
+            data.push(newItem);
+          });
+        })
+      return data
+    };
+
+    const genTypeData = async () => {
+
+      const typeDataUrl = pokemonData.types.map((obj) => obj.type.url);
+      const typeDamage = await Promise.all(typeDataUrl.map(dataUrl => fetchTypeData(dataUrl)))
+      const typeDamageData = typeDamage.flat()
+      const filteredData = filterTypeData(typeDamageData)
+      setPokemonDamageList(filteredData)
+    }
+    genTypeData();
     return () => {
       controller.abort();
     };
@@ -182,6 +211,7 @@ const PokemonInfo = () => {
   useEffect(() => {
     formLoaded && console.info(`Form data loaded: ID no. ${pokemonData.id}`);
   }, [pokemonData, formLoaded]);
+  
   // ==================
   if (formLoaded) {
     return (

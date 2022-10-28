@@ -37,7 +37,14 @@ const PokemonTabContent = ({ activeForm, pokemonInfo }) => {
           <div className="col">
             <div className="row h-auto">
               <div className="col">
-                <DamageCalculator />
+                <div className="row">
+                  <div className="col"><h3>Takes damage from:</h3></div>
+                </div>
+                <div className="row">
+                  <div className="col">
+                  <DamageCalculator />
+                  </div>
+                </div>
               </div>
             </div>
             <div className="row mt-auto">

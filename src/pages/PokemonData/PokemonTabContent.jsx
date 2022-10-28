@@ -1,6 +1,7 @@
 import { MoonLoader } from "react-spinners";
 import "./PokemonTabContent.css";
 import TabContentCard from "./PokemonTabContent/TabContentCard";
+import DamageCalculator from "./PokemonTabContent/DamageCalculator";
 
 // pokemonInfo format
 // name: "",
@@ -33,7 +34,18 @@ const PokemonTabContent = ({ activeForm, pokemonInfo }) => {
               abilities={pokemonInfo.abilities}
             />
           </div>
-          <div className="col">Pokemon info</div>
+          <div className="col">
+            <div className="row h-auto">
+              <div className="col">
+                <DamageCalculator />
+              </div>
+            </div>
+            <div className="row mt-auto">
+              <div className="col">
+                <p>Note: If type is not listed above, assume that it is a 1x damage</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );

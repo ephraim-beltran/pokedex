@@ -1,7 +1,9 @@
 import { useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, createContext } from "react";
 import PokemonForms from "./PokemonData/PokemonForms";
 import PokemonTabContent from "./PokemonData/PokemonTabContent";
+
+export const PokemonDataContext = createContext();
 
 const PokemonInfo = () => {
   const { id } = useParams();
@@ -34,36 +36,62 @@ const PokemonInfo = () => {
   });
   const [formLoaded, setFormLoaded] = useState(false);
   const [pokemonDamageList, setPokemonDamageList] = useState([]);
-  let pokemonInfo = {};
-  if (formLoaded) {
-    pokemonInfo = {
-      name: species.name,
-      forms: species.varieties,
-      image: pokemonData.sprites.other["official-artwork"].front_default,
-      type: pokemonData.types.map((types) => types.type.name),
-      stats: pokemonData.stats.map((stats) => {
-        return {
-          name: stats.stat.name,
-          base_stat: stats.base_stat,
-        };
-      }),
-      abilities: pokemonData.abilities.map((abilities) => {
-        return {
-          name: abilities.ability.name,
-          is_hidden: abilities.is_hidden,
-        };
-      }),
-      national_dex:
-        species.pokedex_numbers[
-          species.pokedex_numbers.findIndex(
-            (dex) => dex.pokedex.name === "national"
-          )
-        ].entry_number,
-        defensive: pokemonDamageList.filter(obj => obj.position === 'defence'),
-        offensive: pokemonDamageList.filter(obj => obj.position === 'attack')
-    };
-  }
+  // let pokemonInfo = {};
+  // if (formLoaded) {
+  //   pokemonInfo = {
+  //     name: species.name,
+  //     forms: species.varieties,
+  //     image: pokemonData.sprites.other["official-artwork"].front_default,
+  //     type: pokemonData.types.map((types) => types.type.name),
+  //     stats: pokemonData.stats.map((stats) => {
+  //       return {
+  //         name: stats.stat.name,
+  //         base_stat: stats.base_stat,
+  //       };
+  //     }),
+  //     abilities: pokemonData.abilities.map((abilities) => {
+  //       return {
+  //         name: abilities.ability.name,
+  //         is_hidden: abilities.is_hidden,
+  //       };
+  //     }),
+  //     national_dex:
+  //       species.pokedex_numbers[
+  //         species.pokedex_numbers.findIndex(
+  //           (dex) => dex.pokedex.name === "national"
+  //         )
+  //       ].entry_number,
+  //       defensive: pokemonDamageList.filter(obj => obj.position === 'defence'),
+  //       offensive: pokemonDamageList.filter(obj => obj.position === 'attack')
+  //   };
+  // }
 
+  const pokemonInfo = formLoaded && {
+    name: species.name,
+    forms: species.varieties,
+    image: pokemonData.sprites.other["official-artwork"].front_default,
+    type: pokemonData.types.map((types) => types.type.name),
+    stats: pokemonData.stats.map((stats) => {
+      return {
+        name: stats.stat.name,
+        base_stat: stats.base_stat,
+      };
+    }),
+    abilities: pokemonData.abilities.map((abilities) => {
+      return {
+        name: abilities.ability.name,
+        is_hidden: abilities.is_hidden,
+      };
+    }),
+    national_dex:
+      species.pokedex_numbers[
+        species.pokedex_numbers.findIndex(
+          (dex) => dex.pokedex.name === "national"
+        )
+      ].entry_number,
+    defensive: pokemonDamageList.filter((obj) => obj.position === "defence"),
+    offensive: pokemonDamageList.filter((obj) => obj.position === "attack"),
+  };
   useEffect(() => {
     setFormLoaded(false);
     const controller = new AbortController();
@@ -117,93 +145,94 @@ const PokemonInfo = () => {
     const filterTypeData = (data) => {
       let damageListFiltered = [];
 
-      data.forEach(obj => {
+      data.forEach((obj) => {
         const index = damageListFiltered.findIndex(
           (item) => item.type === obj.type && item.position === obj.position
         );
-        
+
         if (index !== -1) {
           damageListFiltered[index].damage =
             damageListFiltered[index].damage * obj.damage;
         } else {
           damageListFiltered.push(obj);
         }
-      })
-      
-      return damageListFiltered
+      });
+
+      return damageListFiltered;
     };
 
     const fetchTypeData = async (dataUrl) => {
       let data = [];
 
-        const typeData = await fetch(dataUrl).then((res) => res.json());
-        const damageRelations = await typeData.damage_relations; // Return an Object
-        const damageMultiplier = Object.keys(damageRelations); // Returns an array
-        damageMultiplier.forEach((multiplier) => {
-          let position;
-          let damage;
-          switch (multiplier) {
-            case "double_damage_from":
-              position = "defence";
-              damage = 2;
-              break;
+      const typeData = await fetch(dataUrl).then((res) => res.json());
+      const damageRelations = await typeData.damage_relations; // Return an Object
+      const damageMultiplier = Object.keys(damageRelations); // Returns an array
+      damageMultiplier.forEach((multiplier) => {
+        let position;
+        let damage;
+        switch (multiplier) {
+          case "double_damage_from":
+            position = "defence";
+            damage = 2;
+            break;
 
-            case "double_damage_to":
-              position = "attack";
-              damage = 2;
-              break;
+          case "double_damage_to":
+            position = "attack";
+            damage = 2;
+            break;
 
-            case "half_damage_from":
-              position = "defence";
-              damage = 0.5;
-              break;
+          case "half_damage_from":
+            position = "defence";
+            damage = 0.5;
+            break;
 
-            case "half_damage_to":
-              position = "attack";
-              damage = 0.5;
-              break;
+          case "half_damage_to":
+            position = "attack";
+            damage = 0.5;
+            break;
 
-            case "no_damage_from":
-              position = "defence";
-              damage = 0;
-              break;
+          case "no_damage_from":
+            position = "defence";
+            damage = 0;
+            break;
 
-            case "no_damage_to":
-              position = "attack";
-              damage = 0;
-              break;
+          case "no_damage_to":
+            position = "attack";
+            damage = 0;
+            break;
 
-            default:
-              break;
-          }
-          damageRelations[multiplier].forEach((type) => {
-            const newItem = {
-              position: position,
-              damage: damage,
-              type: type.name,
-            }
-            data.push(newItem);
-          });
-        })
-      return data
+          default:
+            break;
+        }
+        damageRelations[multiplier].forEach((type) => {
+          const newItem = {
+            position: position,
+            damage: damage,
+            type: type.name,
+          };
+          data.push(newItem);
+        });
+      });
+      return data;
     };
 
     const genTypeData = async () => {
-
       const typeDataUrl = pokemonData.types.map((obj) => obj.type.url);
-      const typeDamage = await Promise.all(typeDataUrl.map(dataUrl => fetchTypeData(dataUrl)))
-      const typeDamageData = typeDamage.flat()
-      const filteredData = filterTypeData(typeDamageData)
-      setPokemonDamageList(filteredData)
-    }
+      const typeDamage = await Promise.all(
+        typeDataUrl.map((dataUrl) => fetchTypeData(dataUrl))
+      );
+      const typeDamageData = typeDamage.flat();
+      const filteredData = filterTypeData(typeDamageData);
+      setPokemonDamageList(filteredData);
+    };
     genTypeData();
     return () => {
       controller.abort();
     };
   }, [pokemonData]);
 
-  // ==================
   // Used for debugging
+  // ==================
   useEffect(() => {
     speciesLoaded && console.info(`Species loaded: ${species.name}`);
   }, [speciesLoaded, species]);
@@ -211,11 +240,11 @@ const PokemonInfo = () => {
   useEffect(() => {
     formLoaded && console.info(`Form data loaded: ID no. ${pokemonData.id}`);
   }, [pokemonData, formLoaded]);
-  
+
   // ==================
   if (formLoaded) {
     return (
-      <>
+      <PokemonDataContext.Provider value={pokemonInfo}>
         <div className="row align-items-center">
           <h1 className="col-auto" style={{ textTransform: "capitalize" }}>
             {pokemonInfo.name}
@@ -236,7 +265,7 @@ const PokemonInfo = () => {
             varieties={species.varieties}
           />
         </div>
-      </>
+      </PokemonDataContext.Provider>
     );
   } else {
     return <div>Loading Pokemon</div>;

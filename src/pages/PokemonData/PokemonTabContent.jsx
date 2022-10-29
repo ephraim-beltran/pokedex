@@ -28,11 +28,7 @@ const PokemonTabContent = ({ activeForm, pokemonInfo }) => {
       >
         <div className="row">
           <div className="col-lg-4 col-sm-5">
-            <TabContentCard
-              image={pokemonInfo.image}
-              type={pokemonInfo.type}
-              abilities={pokemonInfo.abilities}
-            />
+            <TabContentCard />
           </div>
           <div className="col">
             <div className="row h-auto">

@@ -74,3 +74,27 @@
 .fairy {
   background-color: #d685ad;
 }
+
+.pokemon-stats {
+  display: grid;
+  place-items: center;
+}
+.pokemon-stats-label {
+  color: black;
+  font-size: 2rem;
+  text-anchor: middle;
+}
+.pokemon-stats-container {
+  fill: grey;
+  fill-opacity: 70%;
+}
+.pokemon-stats-value {
+  fill: rgb(124, 79, 209);
+  text-anchor: middle;
+  font-size: 2.3rem;
+  font-weight: 700;
+}
+.pokemon-stats-chart {
+  fill: rgb(124, 79, 209);
+  fill-opacity: 50%;
+}

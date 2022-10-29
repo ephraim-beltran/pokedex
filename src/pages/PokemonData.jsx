@@ -36,35 +36,6 @@ const PokemonInfo = () => {
   });
   const [formLoaded, setFormLoaded] = useState(false);
   const [pokemonDamageList, setPokemonDamageList] = useState([]);
-  // let pokemonInfo = {};
-  // if (formLoaded) {
-  //   pokemonInfo = {
-  //     name: species.name,
-  //     forms: species.varieties,
-  //     image: pokemonData.sprites.other["official-artwork"].front_default,
-  //     type: pokemonData.types.map((types) => types.type.name),
-  //     stats: pokemonData.stats.map((stats) => {
-  //       return {
-  //         name: stats.stat.name,
-  //         base_stat: stats.base_stat,
-  //       };
-  //     }),
-  //     abilities: pokemonData.abilities.map((abilities) => {
-  //       return {
-  //         name: abilities.ability.name,
-  //         is_hidden: abilities.is_hidden,
-  //       };
-  //     }),
-  //     national_dex:
-  //       species.pokedex_numbers[
-  //         species.pokedex_numbers.findIndex(
-  //           (dex) => dex.pokedex.name === "national"
-  //         )
-  //       ].entry_number,
-  //       defensive: pokemonDamageList.filter(obj => obj.position === 'defence'),
-  //       offensive: pokemonDamageList.filter(obj => obj.position === 'attack')
-  //   };
-  // }
 
   const pokemonInfo = formLoaded && {
     name: species.name,
@@ -273,5 +244,3 @@ const PokemonInfo = () => {
 };
 
 export default PokemonInfo;
-
-// TODO: Summarize damageList

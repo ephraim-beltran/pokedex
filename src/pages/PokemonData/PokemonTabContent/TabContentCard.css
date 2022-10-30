@@ -98,3 +98,8 @@
   fill: rgb(124, 79, 209);
   fill-opacity: 50%;
 }
+.pokemon-stats-line {
+  stroke: white;
+  stroke-opacity: 40%;
+  stroke-width: 2%
+}

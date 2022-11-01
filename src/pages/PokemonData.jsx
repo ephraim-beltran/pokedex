@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect, createContext } from "react";
 import PokemonForms from "./PokemonData/PokemonForms";
-import PokemonTabContent from "./PokemonData/PokemonTabContent";
+import PokemonTabContent from "./PokemonData/PokemonTabContent/TabContentCard/PokemonTabContent";
 
 export const PokemonDataContext = createContext();
 

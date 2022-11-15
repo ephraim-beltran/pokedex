@@ -5,6 +5,28 @@ import PokemonTabContent from "./PokemonData/PokemonTabContent/TabContentCard/Po
 
 export const PokemonDataContext = createContext();
 
+const filterName = (name, id) => {
+  // Accepts a string and an integer value RETURNS an object {name, serebii}
+  const filters = {
+    galar: ["galarian", "g"],
+    alola: ["alolan", "a"],
+    gmax: ["gmax", "gi"],
+  };
+  let pokeName = name;
+  const dexId = '000' + id.toString();
+  let formattedId = dexId.slice(-3)
+  Object.keys(filters).forEach((filter) => {
+    if (name.includes(`-${filter}`)) {
+      pokeName = `${filters[filter][0]} ${pokeName.replace(`-${filter}`, "")}`;
+      formattedId = formattedId + '-' + filters[filter][1];
+    }
+  });
+  return {
+    name: pokeName,
+    serebii: `https://www.serebii.net/Shiny/SWSH/${formattedId}.png`,
+  };
+};
+
 const PokemonInfo = () => {
   const { id } = useParams();
   const [species, setSpecies] = useState({
@@ -21,6 +43,7 @@ const PokemonInfo = () => {
   });
   const [speciesLoaded, setSpeciesLoaded] = useState(false); // Only used for debugging
   const [activeForm, setActiveForm] = useState({});
+  const [shiny, setShiny] = useState(false);
   const [pokemonData, setPokemonData] = useState({
     types: [],
     stats: [],
@@ -37,10 +60,19 @@ const PokemonInfo = () => {
   const [formLoaded, setFormLoaded] = useState(false);
   const [pokemonDamageList, setPokemonDamageList] = useState([]);
 
+  const dexId = formLoaded &&
+    species.pokedex_numbers[
+      species.pokedex_numbers.findIndex(
+        (dex) => dex.pokedex.name === "national"
+      )
+    ].entry_number;
   const pokemonInfo = formLoaded && {
     name: species.name,
     forms: species.varieties,
-    image: pokemonData.sprites.other["official-artwork"].front_default,
+    national_dex: dexId,
+    image: shiny
+      ? filterName(activeForm.pokemon.name, dexId).serebii
+      : pokemonData.sprites.other["official-artwork"].front_default,
     type: pokemonData.types.map((types) => types.type.name),
     stats: pokemonData.stats.map((stats) => {
       return {
@@ -54,15 +86,12 @@ const PokemonInfo = () => {
         is_hidden: abilities.is_hidden,
       };
     }),
-    national_dex:
-      species.pokedex_numbers[
-        species.pokedex_numbers.findIndex(
-          (dex) => dex.pokedex.name === "national"
-        )
-      ].entry_number,
     defensive: pokemonDamageList.filter((obj) => obj.position === "defence"),
     offensive: pokemonDamageList.filter((obj) => obj.position === "attack"),
   };
+  const shinify = () => {
+    setShiny(!shiny)
+  }
   useEffect(() => {
     setFormLoaded(false);
     const controller = new AbortController();
@@ -223,6 +252,7 @@ const PokemonInfo = () => {
           <h2 className="col-auto fw-lighter align-self-end">
             # {pokemonInfo.national_dex}
           </h2>
+          <button className="btn btn-primary col-1" onClick={shinify}>Shiny</button>
         </div>
         <PokemonForms
           pokeFormList={pokemonInfo.forms}

@@ -28,8 +28,6 @@
   align-content: center;
   gap: 5%;
   z-index: 1;
-  margin-top: -28%;
-  margin-bottom: 10%;
 }
 .pokemon-type-item {
   text-transform: uppercase;

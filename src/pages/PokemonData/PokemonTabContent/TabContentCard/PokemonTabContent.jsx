@@ -27,7 +27,7 @@ const PokemonTabContent = ({ activeForm, pokemonInfo }) => {
         tabIndex="0"
       >
         <div className="row">
-          <div className="col-lg-4 col-sm-5">
+          <div className="col-lg-3 col-sm-5">
             <TabContentCard />
           </div>
           <div className="col">
